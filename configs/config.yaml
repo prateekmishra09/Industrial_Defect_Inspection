@@ -1,0 +1,46 @@
+project:
+  name: "Industrial_Surface_Defect_Inspection"
+  dataset_name: "mvtec_ad"
+  device: "cuda" # Automatically falls back to cpu if cuda unavailable
+
+dataset:
+  root_dir: "./data/mvtec_anomaly_detection"
+  image_size: [256, 256]
+  channels: 3
+  random_seed: 42
+
+training:
+  batch_size: 16
+  num_workers: 2
+  epochs: 80
+  learning_rate: 0.001
+  weight_decay: 1e-5
+  checkpoint_dir: "./checkpoints"
+  save_interval: 10
+
+models:
+  basic_v2:
+    latent_dim: 128
+    base_channels: 32
+  skip_v2:
+    latent_dim: 128
+    base_channels: 32
+  gated_skip:
+    latent_dim: 128
+    base_channels: 32
+  vae_v2:
+    latent_dim: 128
+    base_channels: 32
+    kl_weight: 0.0005
+
+calibration:
+  gaussian_kernel_size: 11
+  gaussian_sigma: 4.0
+  topk_ratio: 0.005 # Top 0.5% worst pixels for image score (approx 327 pixels at 256x256)
+  pixel_false_positive_rate: 0.005 # 99.5th percentile on validation normal
+  image_false_positive_rate: 0.02  # 98.0th percentile on validation normal
+  min_defect_area_pixels: 20       # Filter out isolated sensor noise
+
+loss:
+  alpha_l1: 0.5
+  ssim_window_size: 11
